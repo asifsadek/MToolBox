@@ -440,7 +440,7 @@ sam_file = open(basext+'.sam', 'r')
 mt_table = open(tablefile, 'r').readlines()
 if type(sample_name) == (list):
 	sample_name = sample_name[0]
-mut_events = mtvcf_main_analysis(mt_table, sam_file, sample_name, tail=tail)
+mut_events = mtvcf_main_analysis(mt_table, sam_file, sample_name, tail=tail,Q=mqual)
 if os.path.exists('../VCF_dict_tmp'):
 	VCF_dict = ast.literal_eval(open('../VCF_dict_tmp', 'r').read()) # global VCF dict
 else:
