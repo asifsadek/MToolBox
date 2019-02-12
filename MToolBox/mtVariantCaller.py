@@ -342,7 +342,7 @@ def getIUPAC(ref_var, dIUPAC):
 	return iupac_code
 			
 
-def mtvcf_main_analysis(mtable, sam, name2, tail=5):
+def mtvcf_main_analysis(mtable, sam, name2, tail=5, Q=25):
 	mtable=[i.split('\t') for i in mtable]
 	mtable.remove(mtable[0])
 	sam=sam.readlines()
@@ -420,7 +420,8 @@ def mtvcf_main_analysis(mtable, sam, name2, tail=5):
 		dicqsIns[i]=[]
 		for x in rposIns.get(i):
 			for j in range(len(x[-1])):
-				if int(x[-1][j])>=25:
+				#if int(x[-1][j])>=25:
+                                if int(x[-1][j])>=Q:
 					pass
 				else:
 					x[-1][j]='-'
@@ -433,7 +434,8 @@ def mtvcf_main_analysis(mtable, sam, name2, tail=5):
 		dicqsDel[i]=[]
 		for x in rposDel.get(i):
 			for j in range(len(x[-1])):
-				if int(x[-1][j])>=25:
+				#if int(x[-1][j])>=25:
+                                if int(x[-1][j])>=Q:
 					pass
 				else:
 					x[-1][j]='-'
