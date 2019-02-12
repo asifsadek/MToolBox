@@ -202,6 +202,7 @@ def SearchINDELsintoSAM(readNAME,mate,CIGAR,seq,qs,refposleft,tail=5):
 				qsL.append(ord(x)-33)
 			for x in qsRight:
 				qsR.append(ord(x)-33)
+			print qsL, qsR
 			medL=median(qsL)
 			medR=median(qsR)
 			qsDel.append(medL)
