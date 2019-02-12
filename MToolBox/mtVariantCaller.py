@@ -62,6 +62,7 @@ def median(l):
 		if len(l)%2 != 0:
 			median= sorted(l)[((len(l)+1)/2)-1]
 		else:
+			print l
 			m1 = sorted(l)[(len(l)/2)+1-1]
 			m2 = sorted(l)[(len(l)/2)-1]
 			median= (float(m1)+float(m2))/2
