@@ -87,8 +87,10 @@ def error(list):
 #defines the function searching for and filtering indels within the read sequence	
 def SearchINDELsintoSAM(readNAME,mate,CIGAR,seq,qs,refposleft,tail=5):
 	m=re.compile(r'[a-z]', re.I)
+	print m
 	if 'I' in CIGAR:
 		pcigar=CIGAR.partition('I')
+		print "Insertion",pcigar
 		if 'S' in pcigar[0]:
 			softclippingleft=int(pcigar[0].partition('S')[0]) # calc softclipped bases left
 		else:
@@ -116,7 +118,9 @@ def SearchINDELsintoSAM(readNAME,mate,CIGAR,seq,qs,refposleft,tail=5):
 		else:
 			hardclippingright=0 # no hardclipped bases right
 		left=m.split(pcigar[0])
+		print left
 		right=m.split(pcigar[-1])
+		print right
 		numIns=int(left[-1])
 		left.pop(-1)
 		s=sum(left) # number of 5' flanking positions to Ins
@@ -136,6 +140,7 @@ def SearchINDELsintoSAM(readNAME,mate,CIGAR,seq,qs,refposleft,tail=5):
 			strand='nondefined'
 		else:
 			strand='mate2'
+		print "mate",mate
 		if lflank >= tail and sr>= tail:
 			for x in qsInsASCI:
 				numeric=(ord(x)-33)
@@ -152,6 +157,7 @@ def SearchINDELsintoSAM(readNAME,mate,CIGAR,seq,qs,refposleft,tail=5):
 		return res
 	elif 'D' in CIGAR:
 		pcigar=CIGAR.partition('D')
+		print "Deletion",pcigar
 		if 'S' in pcigar[0]:
 			softclippingleft=int(pcigar[0].partition('S')[0]) # calc softclipped bases left
 		else:
@@ -178,24 +184,36 @@ def SearchINDELsintoSAM(readNAME,mate,CIGAR,seq,qs,refposleft,tail=5):
 				hardclippingright=int(rhcnt[0])			
 		else:
 			hardclippingright=0 # no hardclipped bases right
+		print "pcigar",pcigar
 		left=m.split(pcigar[0])
 		right=m.split(pcigar[-1])
+		print "left",left
+		print "right",right
 		nDel=int(left[-1])
 		left.pop(-1)
-		s=sum(left) # number of 5' flanking positions to Del
+		s=sum(left)
+		print "s",s
 		error(right)
 		sr=sum(right)-(hardclippingright+softclippingright) # number of 3' flanking positions to Del
-		lflank=s-softclippingleft # exclude softclipped bases from left pos calculation
-		lflank=s-hardclippingleft # exclude hardclipped bases from left pos calculation
+		lflank=s-(softclippingleft+hardclippingleft) # exclude 5' flanking softclipped/hardclipped bases from left pos calculation
+		#print "lflank=s-softclippingleft", lflank
+		#lflank=s-hardclippingleft # exclude hardclipped bases from left pos calculation
+		print "lflank",lflank
 		rLeft=(refposleft+lflank)
+		print "rLeft",rLeft
 		lowlimit=rLeft+1
+		print "lowlimit",lowlimit
 		rRight=lowlimit+nDel
 		Del=range(lowlimit,rRight)
+		print "Del",Del
 		type='Del'
 		qsDel=[]
 		if lflank>=tail and sr>=tail:
-			qsLeft=qs[(s-5):s]
-			qsRight=qs[s:(s+5)]
+			print lflank,sr,qs,s	
+			#qsLeft=qs[(s-5):s]
+			#qsRight=qs[s:(s+5)]
+			qsLeft=qs[(lflank-5):lflank]
+			qsRight=qs[lflank:(lflank+5)]
 			qsL=[]
 			qsR=[]
 			for x in qsLeft:
@@ -215,6 +233,7 @@ def SearchINDELsintoSAM(readNAME,mate,CIGAR,seq,qs,refposleft,tail=5):
 			strand='nondefined'
 		else:
 			strand='mate2'
+		print "mate",mate
 		res=[]
 		res.append(type)
 		res.append(readNAME)
@@ -380,10 +399,11 @@ def mtvcf_main_analysis(mtable, sam, name2, tail=5, Q=25):
 	print "\n\nsearching for indels in {0}.. please wait...\n\n".format(name2)
 	for i in sam:
 		[CIGAR, readNAME, seq, qs, refposleft, mate] = varnames(i)
-		#print "CIGAR", CIGAR
+		print CIGAR, readNAME, seq, qs, refposleft, mate
 		# varnames()
 		if 'I' in CIGAR or 'D' in CIGAR:
 			r=SearchINDELsintoSAM(readNAME,mate,CIGAR,seq, qs,refposleft,tail=tail)
+			print "This is r", r
 			dic[r[0]].append(r[1:])
 	#############
 	rposIns={}
